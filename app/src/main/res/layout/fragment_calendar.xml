@@ -6,17 +6,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <CalendarView
+        <com.github.hyogeun.willbe.ui.view.CalendarView
             android:id="@+id/calendar_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minDate="10/01/2017"
-            android:maxDate="12/31/2025"
-            android:focusedMonthDateColor="#ff0000"
-            android:unfocusedMonthDateColor="#0000ff"
-            android:selectedWeekBackgroundColor="#ffff00"
-            android:showWeekNumber="false"
-            android:weekSeparatorLineColor="#00ff00"
+            android:minHeight="300dp"
+            android:background="@color/colorAccent"
+            app:dateFormat="yyyy-MM-dd"
+            app:layout_constraintBottom_toTopOf="@+id/calendar_content_recycler_view"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
