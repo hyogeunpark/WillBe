@@ -11,8 +11,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.github.hyogeun.willbe.R
@@ -22,11 +20,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
-import android.view.WindowManager
-import android.view.Display
-
-
-
 
 
 /**
@@ -54,10 +47,11 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
     // month-season association (northern hemisphere, sorry australia :)
     private var monthSeason = intArrayOf(2, 2, 3, 3, 3, 0, 0, 0, 1, 1, 1, 2)
 
+    private lateinit var mAdapter: CalendarAdapter
     private var binding: ViewCalendarBinding
 
     init {
-        val inflater:LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         binding = DataBindingUtil.inflate(inflater, R.layout.view_calendar, this, false)
         addView(binding.root)
         assignClickHandlers()
@@ -65,7 +59,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
         updateCalendar()
     }
 
-    private fun loadDateFormat(attrs: AttributeSet?): String  {
+    private fun loadDateFormat(attrs: AttributeSet?): String {
         val ta: TypedArray = context.obtainStyledAttributes(attrs, R.styleable.CalendarView)
         // try to load provided date format, and fallback to default otherwise
         dateFormat = ta.getString(R.styleable.CalendarView_dateFormat) ?: DATE_FORMAT
@@ -88,7 +82,6 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
         })
     }
 
-
     /**
      * Display dates correctly in grid
      */
@@ -96,12 +89,10 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
         updateCalendar(null)
     }
 
-
     /**
      * Display dates correctly in grid
      */
-    fun updateCalendar(events: HashSet<Date>?)
-    {
+    fun updateCalendar(events: HashSet<Date>?) {
         val cells: ArrayList<Date> = ArrayList()
         val calendar: Calendar = currentDate.clone() as Calendar
 
@@ -116,14 +107,18 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
 
         // fill cells
-        while (cells.size < DAYS_COUNT)
-        {
+        while (cells.size < DAYS_COUNT) {
             cells.add(calendar.time)
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
 
         // update grid
-        binding.calendarGrid.adapter = CalendarAdapter(cells, events)
+        if (binding.calendarGrid.adapter == null) {
+            mAdapter = CalendarAdapter(cells, events)
+            binding.calendarGrid.adapter = mAdapter
+        } else {
+            mAdapter.refreshData(days = cells, eventDays = events)
+        }
 
         // update title
         val sdf = SimpleDateFormat(dateFormat)
@@ -138,18 +133,24 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
     }
 
     @Suppress("DEPRECATION")
-    inner class CalendarAdapter(days: ArrayList<Date>, eventDays: HashSet<Date>?): RecyclerView.Adapter<CalendarAdapter.ViewHolder>() {
+    inner class CalendarAdapter(days: ArrayList<Date>, eventDays: HashSet<Date>?) : RecyclerView.Adapter<CalendarAdapter.ViewHolder>() {
         // days with events
         private var eventDays: HashSet<Date>? = eventDays
-        private var days:ArrayList<Date> = days
-        init {
-            val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            val display = wm.defaultDisplay
+        private var days: ArrayList<Date> = days
+
+        fun refreshData(days: ArrayList<Date>, eventDays: HashSet<Date>?) {
+            this.days.apply {
+                clear()
+                addAll(days)
+            }
+            this.eventDays = eventDays
+            notifyDataSetChanged()
         }
 
         private fun getItem(position: Int): Date {
             return days[position]
         }
+
         override fun getItemCount(): Int {
             return days.size
         }
@@ -161,114 +162,56 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
         }
 
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-            val date:Date = getItem(position)
-            val day = date.day
+            val today = Date()
+            val date: Date = getItem(position)
+            val day = date.date
             val month = date.month
             val year = date.year
 
-            // today
-            val today = Date()
-
-            // if this day has an event, specify event image
-            (holder?.itemView as TextView).setBackgroundResource(0)
-            eventDays?.let {
-                for (eventDate in it) {
-                    if (eventDate.date == day && eventDate.month == month && eventDate.year == year) {
-                        // mark this day for event
-                        holder.itemView.setBackgroundResource(R.drawable.event_circle)
-                        break
-                    }
-                }
-            }
-
             // clear styling
-            (holder.itemView as TextView).apply {
+            (holder?.itemView as TextView).apply {
                 setTypeface(null, Typeface.NORMAL)
                 setTextColor(Color.BLACK)
                 text = date.date.toString()
             }
 
-            if (month != today.month || year != today.year) {
-                // if this day is outside current month, grey it out
-                holder.itemView.setTextColor(resources.getColor(R.color.greyed_out))
-            }
-            else if (day == today.date) {
-                // if it is today, set it to blue/bold
-                holder.itemView.let {
-                    it.setTypeface(null, Typeface.BOLD)
-                    it.setTextColor(resources.getColor(R.color.today))
+            eventDays?.takeIf { it.contains(date) && !(year == today.year && month == today.month && day == today.date)}?.let {
+                // if this day has an event, specify event image
+                (holder.itemView as TextView).apply {
+                    when (date.day) {
+                        0 -> setTextColor(resources.getColor(android.R.color.holo_red_dark))
+                        6 -> setTextColor(resources.getColor(android.R.color.holo_blue_dark))
+                        else -> setTextColor(resources.getColor(android.R.color.black))
+                    }
+                    setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.event_circle, 0)
+                }
+            } ?: (holder.itemView as TextView).apply {
+                if (month != currentDate.time.month || year != currentDate.time.year) {
+                    // if this day is outside current month, grey it out
+                    setTextColor(resources.getColor(R.color.greyed_out))
+                } else if (year == today.year && month == today.month && day == today.date) {
+                    // if it is currentDate, set it to blue/bold
+                    setTypeface(null, Typeface.BOLD)
+                    setTextColor(resources.getColor(android.R.color.white))
+                    setBackgroundResource(R.drawable.today_circle)
+                } else if (date.day == 0 || date.day == 6) {
+                    when (date.day) {
+                        0 -> setTextColor(resources.getColor(android.R.color.holo_red_dark))
+                        6 -> setTextColor(resources.getColor(android.R.color.holo_blue_dark))
+                        else -> setTextColor(resources.getColor(android.R.color.black))
+                    }
                 }
             }
-            holder.itemView.width = display.width/7
+            (holder.itemView as TextView).width = display.width / 7
         }
 
-        inner class ViewHolder(view: View): RecyclerView.ViewHolder(view)
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
     }
-
-    /*@Suppress("DEPRECATION")
-    inner class CalendarAdapter(context: Context?, days: ArrayList<Date>?, eventDays: HashSet<Date>?) : ArrayAdapter<Date>(context, R.layout.view_calendar_day, days)
-    {
-        // days with events
-        private var eventDays: HashSet<Date>? = eventDays
-
-        // for view inflation
-        private var inflater:LayoutInflater = LayoutInflater.from(context)
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            // day in question
-            val date:Date = getItem(position)
-            val day = date.day
-            val month = date.month
-            val year = date.year
-
-            // inflate item if it does not exist yet
-            var retView: View = convertView ?: inflater.inflate(R.layout.view_calendar_day, parent, false)
-
-            // today
-            val today = Date()
-
-            // if this day has an event, specify event image
-            retView.setBackgroundResource(0)
-            eventDays?.let {
-                for (eventDate in it) {
-                    if (eventDate.date == day && eventDate.month == month && eventDate.year == year) {
-                        // mark this day for event
-                        retView.setBackgroundResource(R.drawable.event_circle)
-                        break
-                    }
-                }
-            }
-
-            // clear styling
-            (retView as TextView).apply {
-                setTypeface(null, Typeface.NORMAL)
-                setTextColor(Color.BLACK)
-                text = date.date.toString()
-            }
-
-            if (month != today.month || year != today.year)
-            {
-                // if this day is outside current month, grey it out
-                retView.setTextColor(resources.getColor(R.color.greyed_out))
-            }
-            else if (day == today.date)
-            {
-                // if it is today, set it to blue/bold
-                retView.let {
-                    it.setTypeface(null, Typeface.BOLD)
-                    it.setTextColor(resources.getColor(R.color.today))
-                }
-            }
-
-            return retView
-        }
-    }*/
 
     /**
      * Assign event handler to be passed needed events
      */
-    fun setEventHandler(eventHandler: EventHandler)
-    {
+    fun setEventHandler(eventHandler: EventHandler) {
         this.eventHandler = eventHandler
     }
 
@@ -276,8 +219,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * This interface defines what events to be reported to
      * the outside world
      */
-    interface EventHandler
-    {
+    interface EventHandler {
         fun onDayLongPress(date: Date)
     }
 }

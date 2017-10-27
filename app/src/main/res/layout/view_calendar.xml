@@ -26,7 +26,8 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:src="@mipmap/previous_icon"
-                android:tint="@color/cardview_dark_background"/>
+                android:tint="@color/cardview_dark_background"
+                android:background="?selectableItemBackground"/>
 
             <!-- date title -->
             <TextView
@@ -49,7 +50,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:src="@mipmap/next_icon"
-                android:tint="@color/cardview_dark_background"/>
+                android:tint="@color/cardview_dark_background"
+                android:background="?selectableItemBackground"/>
         </RelativeLayout>
 
         <!-- days header -->

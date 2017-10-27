@@ -1,12 +1,16 @@
 package com.github.hyogeun.willbe.ui.main
 
 import android.databinding.DataBindingUtil
+import android.graphics.PorterDuff
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.ViewGroup
 import com.github.hyogeun.willbe.R
 import com.github.hyogeun.willbe.databinding.ActivityMainBinding
@@ -29,8 +33,30 @@ class MainActivity: AppCompatActivity() {
         mBinding.mainViewPager.adapter = ViewPagerAdapter(supportFragmentManager)
         mBinding.mainTabLayout.setupWithViewPager(mBinding.mainViewPager)
         /** set tab icon **/
-        mBinding.mainTabLayout.getTabAt(0)?.icon = ContextCompat.getDrawable(this@MainActivity, R.mipmap.timer)
+        mBinding.mainTabLayout.getTabAt(0)?.icon = ContextCompat.getDrawable(this@MainActivity, R.mipmap.timer).apply {
+            setColorFilter(ContextCompat.getColor(this@MainActivity, R.color.colorAccent), PorterDuff.Mode.SRC_IN)
+        }
         mBinding.mainTabLayout.getTabAt(1)?.icon = ContextCompat.getDrawable(this@MainActivity, R.mipmap.calendar_clock)
+        mBinding.mainTabLayout.addOnTabSelectedListener(object: TabLayout.ViewPagerOnTabSelectedListener(mBinding.mainViewPager) {
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                super.onTabUnselected(tab)
+                tab?.icon?.setColorFilter(ContextCompat.getColor(this@MainActivity, android.R.color.white), PorterDuff.Mode.SRC_IN)
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                super.onTabSelected(tab)
+                tab?.icon?.setColorFilter(ContextCompat.getColor(this@MainActivity, R.color.colorAccent), PorterDuff.Mode.SRC_IN)
+            }
+        })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return super.onOptionsItemSelected(item)
     }
 
     inner class ViewPagerAdapter(fm: FragmentManager): FragmentPagerAdapter(fm) {

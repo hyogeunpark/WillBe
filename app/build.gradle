@@ -25,19 +25,20 @@ android {
     dataBinding {
         enabled = true
     }
+    buildToolsVersion '26.0.2'
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile rootProject.ext.appcompatLib
-    compile rootProject.ext.design
-    compile rootProject.ext.cardView
-    compile rootProject.ext.recyclerView
-    compile rootProject.ext.constraintLayout
-    compile rootProject.ext.kotlin
-    kapt 'com.android.databinding:compiler:2.3.1'
-    testCompile 'junit:junit:4.12'
+    implementation rootProject.ext.appcompatLib
+    implementation rootProject.ext.design
+    implementation rootProject.ext.cardView
+    implementation rootProject.ext.recyclerView
+    implementation rootProject.ext.constraintLayout
+    implementation rootProject.ext.kotlin
+    kapt 'com.android.databinding:compiler:3.0.0'
+    testImplementation 'junit:junit:4.12'
 }
