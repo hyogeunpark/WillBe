@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import com.github.hyogeun.willbe.R
 import com.github.hyogeun.willbe.databinding.ActivityMainBinding
+import com.github.hyogeun.willbe.ui.calendar.AddAlarmActivity
 import com.github.hyogeun.willbe.ui.calendar.CalendarFragment
 import com.github.hyogeun.willbe.ui.time.TimeFragment
 
@@ -33,8 +34,10 @@ class MainActivity: AppCompatActivity() {
         mBinding.mainViewPager.adapter = ViewPagerAdapter(supportFragmentManager)
         mBinding.mainTabLayout.setupWithViewPager(mBinding.mainViewPager)
         /** set tab icon **/
+        mBinding.mainTabLayout.setSelectedTabIndicatorColor(ContextCompat.getColor(this@MainActivity, R.color.colorPrimary))
+        mBinding.mainTabLayout.setBackgroundResource(R.color.colorAccent)
         mBinding.mainTabLayout.getTabAt(0)?.icon = ContextCompat.getDrawable(this@MainActivity, R.mipmap.timer).apply {
-            setColorFilter(ContextCompat.getColor(this@MainActivity, R.color.colorAccent), PorterDuff.Mode.SRC_IN)
+            setColorFilter(ContextCompat.getColor(this@MainActivity, android.R.color.black), PorterDuff.Mode.SRC_IN)
         }
         mBinding.mainTabLayout.getTabAt(1)?.icon = ContextCompat.getDrawable(this@MainActivity, R.mipmap.calendar_clock)
         mBinding.mainTabLayout.addOnTabSelectedListener(object: TabLayout.ViewPagerOnTabSelectedListener(mBinding.mainViewPager) {
@@ -45,7 +48,7 @@ class MainActivity: AppCompatActivity() {
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 super.onTabSelected(tab)
-                tab?.icon?.setColorFilter(ContextCompat.getColor(this@MainActivity, R.color.colorAccent), PorterDuff.Mode.SRC_IN)
+                tab?.icon?.setColorFilter(ContextCompat.getColor(this@MainActivity, android.R.color.black), PorterDuff.Mode.SRC_IN)
             }
         })
     }
@@ -56,6 +59,10 @@ class MainActivity: AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if(item?.itemId == R.id.add_alarm){
+            AddAlarmActivity.createInstance(this)
+            return true
+        }
         return super.onOptionsItemSelected(item)
     }
 

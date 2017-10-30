@@ -2,4 +2,5 @@
     <string name="app_name">WillBe</string>
     <string name="tab_time">시간별</string>
     <string name="tab_calendar">날짜별</string>
+    <string name="add_alarm">알람 추가</string>
 </resources>

@@ -1,6 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-</android.support.constraint.ConstraintLayout>
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                app:title="@string/add_alarm"
+                app:titleTextColor="@android:color/white" />
+        </android.support.design.widget.AppBarLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="20dp">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/image_tag_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="이미지 태그"
+                    android:textColor="@android:color/black"
+                    android:textSize="20dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <android.support.v7.widget.AppCompatAutoCompleteTextView
+                    android:id="@+id/auto_complete_text_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/bg_light_gray"
+                    android:hint="명언 / 맛스타그램 등"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:textSize="13sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/add_tag"
+                    app:layout_constraintTop_toBottomOf="@+id/image_tag_title" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/add_tag"
+                    android:layout_width="55dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/round_shadow"
+                    android:foreground="?selectableItemBackground"
+                    android:text="추가"
+                    app:layout_constraintBottom_toBottomOf="@+id/auto_complete_text_view"
+                    app:layout_constraintLeft_toRightOf="@+id/auto_complete_text_view"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/auto_complete_text_view" />
+
+                <com.github.hyogeun.willbe.ui.view.TagLayout
+                    android:id="@+id/tags"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/add_tag" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/alarm_time_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:text="시간 선택"
+                    android:textColor="@android:color/black"
+                    android:textSize="20dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tags" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/alarm_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="?selectableItemBackground"
+                    android:text="2017년 10월 30일"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical"
+                    android:drawableRight="@mipmap/ic_expand_more_black"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/alarm_time_title" />
+
+                <DatePicker
+                    android:id="@+id/alarm_date_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:datePickerMode="calendar"
+                    android:visibility="gone"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/alarm_time_picker"
+                    app:layout_constraintTop_toBottomOf="@+id/alarm_date" />
+
+                <TimePicker
+                    android:id="@+id/alarm_time_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/alarm_date_picker"
+                    app:layout_goneMarginTop="10dp" />
+
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/alarm_memo_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:text="메모"
+                    android:textColor="@android:color/black"
+                    android:textSize="20dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/alarm_time_picker" />
+                
+                <android.support.v7.widget.AppCompatEditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:padding="10dp"
+                    android:background="@drawable/bg_light_gray"
+                    app:layout_constraintTop_toBottomOf="@+id/alarm_memo_title"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"/>
+
+            </android.support.constraint.ConstraintLayout>
+        </ScrollView>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>
