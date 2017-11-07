@@ -7,12 +7,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
+        <com.github.hyogeun.willbe.ui.view.RecyclerViewEmptySupport
             android:id="@+id/calendar_content_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layoutManager="LinearLayoutManager"
-            tools:listitem="@layout/view_calendar_day" />
+            app:layoutManager="GridLayoutManager"
+            app:spanCount="2"
+            tools:listitem="@layout/grid_list_time_alarm" />
 
         <LinearLayout
             android:id="@+id/empty_view"

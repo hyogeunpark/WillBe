@@ -17,7 +17,10 @@ class TagLayout @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr), View.OnClickListener {
 
+    val tags:ArrayList<String> = ArrayList()
+
     fun addTagView(tag: String) {
+        tags.add(tag)
         val tagView = TextView(context).apply {
             text = "#" + tag
             textSize = context.convertDpToPx(5)
@@ -29,16 +32,19 @@ class TagLayout @JvmOverloads constructor(
             setBackgroundResource(R.drawable.shape_tag)
             setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_clear_white, 0)
             setOnClickListener(this@TagLayout)
+            setTag(tag)
         }
         val params:LinearLayout.LayoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, context.convertDpToPx(25).toInt())
         addView(tagView, params)
     }
 
-    fun clearTag() {
-        removeAllViews()
+    override fun onClick(view: View?) {
+        tags.remove(view?.tag.toString())
+        removeView(view)
     }
 
-    override fun onClick(view: View?) {
-        removeView(view)
+    fun clearTag() {
+        tags.clear()
+        removeAllViews()
     }
 }

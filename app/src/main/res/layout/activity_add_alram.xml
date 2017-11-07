@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="visibility"
+            type="android.databinding.ObservableBoolean" />
+    </data>
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -19,14 +26,17 @@
                 app:titleTextColor="@android:color/white" />
         </android.support.design.widget.AppBarLayout>
 
-        <ScrollView
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/scrollview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:fillViewport="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:padding="20dp">
 
                 <android.support.v7.widget.AppCompatTextView
@@ -88,20 +98,134 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tags" />
 
-                <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/alarm_date"
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/alarm_time_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="요일 설정"
+                    app:layout_constraintBottom_toBottomOf="@+id/alarm_time_title"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/alarm_time_title"
+                    app:switchPadding="10dp"
+                    app:track="@drawable/bg_switch_selector" />
+
+                <LinearLayout
+                    android:id="@+id/alarm_date_title_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:background="?selectableItemBackground"
-                    android:text="2017년 10월 30일"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:gravity="center_vertical"
-                    android:drawableRight="@mipmap/ic_expand_more_black"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:weightSum="7"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/alarm_time_title" />
+                    app:layout_constraintTop_toBottomOf="@+id/alarm_time_title">
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textAlignment="gravity"
+                        android:padding="10dp"
+                        android:text="월"
+                        android:background="@drawable/day_selector"
+                        android:textColor="@android:color/black"
+                        android:visibility="@{visibility ? View.GONE : View.VISIBLE}"
+                        android:button="@android:color/transparent"
+                        android:textSize="16dp" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textAlignment="gravity"
+                        android:padding="10dp"
+                        android:background="@drawable/day_selector"
+                        android:visibility="@{visibility ? View.GONE : View.VISIBLE}"
+                        android:button="@android:color/transparent"
+                        android:text="화"
+                        android:textSize="16dp" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/day_selector"
+                        android:textAlignment="gravity"
+                        android:padding="10dp"
+                        android:visibility="@{visibility ? View.GONE : View.VISIBLE}"
+                        android:button="@android:color/transparent"
+                        android:text="수"
+                        android:textSize="16dp" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textAlignment="gravity"
+                        android:background="@drawable/day_selector"
+                        android:padding="10dp"
+                        android:visibility="@{visibility ? View.GONE : View.VISIBLE}"
+                        android:button="@android:color/transparent"
+                        android:text="목"
+                        android:textSize="16dp" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textAlignment="gravity"
+                        android:background="@drawable/day_selector"
+                        android:padding="10dp"
+                        android:visibility="@{visibility ? View.GONE : View.VISIBLE}"
+                        android:button="@android:color/transparent"
+                        android:text="금"
+                        android:textSize="16dp" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textAlignment="gravity"
+                        android:background="@drawable/day_selector"
+                        android:padding="10dp"
+                        android:visibility="@{visibility ? View.GONE : View.VISIBLE}"
+                        android:button="@android:color/transparent"
+                        android:text="토"
+                        android:textSize="16dp" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textAlignment="gravity"
+                        android:background="@drawable/day_selector"
+                        android:padding="10dp"
+                        android:visibility="@{visibility ? View.GONE : View.VISIBLE}"
+                        android:button="@android:color/transparent"
+                        android:text="일"
+                        android:textSize="16dp" />
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/alarm_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?selectableItemBackground"
+                        android:drawableRight="@mipmap/ic_expand_more_black"
+                        android:gravity="center_vertical"
+                        android:text="2017년 10월 30일"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
+                        android:visibility="@{visibility ? View.VISIBLE : View.GONE}"
+                        tools:visibility="gone" />
+                </LinearLayout>
 
                 <DatePicker
                     android:id="@+id/alarm_date_picker"
@@ -112,7 +236,7 @@
                     android:visibility="gone"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintLeft_toRightOf="@+id/alarm_time_picker"
-                    app:layout_constraintTop_toBottomOf="@+id/alarm_date" />
+                    app:layout_constraintTop_toBottomOf="@+id/alarm_date_title_layout" />
 
                 <TimePicker
                     android:id="@+id/alarm_time_picker"
@@ -124,7 +248,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/alarm_date_picker"
                     app:layout_goneMarginTop="10dp" />
 
-
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/alarm_memo_title"
                     android:layout_width="wrap_content"
@@ -135,18 +258,18 @@
                     android:textSize="20dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/alarm_time_picker" />
-                
+
                 <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/alarm_memo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:padding="10dp"
                     android:background="@drawable/bg_light_gray"
-                    app:layout_constraintTop_toBottomOf="@+id/alarm_memo_title"
+                    android:padding="10dp"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"/>
-
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/alarm_memo_title" />
             </android.support.constraint.ConstraintLayout>
-        </ScrollView>
+        </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
 </layout>
