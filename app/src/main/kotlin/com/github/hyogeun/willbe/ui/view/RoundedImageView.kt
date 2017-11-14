@@ -1,73 +1,126 @@
 package com.github.hyogeun.willbe.ui.view
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.*
-import android.support.v4.view.ViewCompat
+import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
 import android.widget.ImageView
-import com.github.hyogeun.willbe.ui.extensions.convertDpToPx
+import com.github.hyogeun.willbe.R
 
 
 /**
  * Created by SAMSUNG on 2017-11-08.
  */
 class RoundedImageView : ImageView {
-    private var mMaskPath: Path? = null
-    private val mMaskPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var mCornerRadius:Int = 10
+
+    private val CORNER_NONE = 0
+    private val CORNER_TOP_LEFT = 1
+    private val CORNER_TOP_RIGHT = 2
+    private val CORNER_BOTTOM_RIGHT = 4
+    private val CORNER_BOTTOM_LEFT = 8
+    private val CORNER_ALL = 15
+    private val SQUARE_NONE = 0
+    private val SQUARE_WIDTH = 1
+    private val SQUARE_HEIGHT = 2
+
+    private val cornerRect = RectF()
+    private val path = Path()
+    private var cornerRadius:Int = 0
+    private var roundedCorners:Int = 0
+    private var squareMode = SQUARE_NONE
 
     constructor(context: Context) : super(context) {
-        init(context)
+        init(context, null)
     }
 
     constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet) {
-        init(context)
+        init(context, attributeSet)
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
-        init(context)
+        init(context, attrs)
     }
 
-    private fun init(context: Context) {
-        ViewCompat.setLayerType(this, ViewCompat.LAYER_TYPE_SOFTWARE, null)
-        mMaskPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-        mMaskPaint.color = context.resources.getColor(android.R.color.transparent)
-
-        mCornerRadius = context.convertDpToPx(12).toInt()
+    private fun init(context: Context, attrs: AttributeSet?) {
+        attrs?.run {
+            val a:TypedArray = context.obtainStyledAttributes(this, R.styleable.RoundedImageView)
+            cornerRadius = a.getDimensionPixelSize(R.styleable.RoundedImageView_cornerRadius, 0)
+            roundedCorners = a.getInt(R.styleable.RoundedImageView_roundedCorners, CORNER_NONE)
+            squareMode = a.getInt(R.styleable.RoundedImageView_squareMode, SQUARE_NONE)
+            a.recycle()
+            invalidate()
+        }
     }
 
-    /**
-     * Set the corner radius to use for the RoundedRectangle.
-     */
-    fun setCornerRadius(cornerRadius: Int) {
-        mCornerRadius = cornerRadius
-        generateMaskPath(width, height)
+    fun setCornerRadius(radius:Int) {
+        cornerRadius = radius
+        setPath()
         invalidate()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldW: Int, oldH: Int) {
-        super.onSizeChanged(w, h, oldW, oldH)
-
-        if (w != oldW || h != oldH) {
-            generateMaskPath(w, h)
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        when(squareMode) {
+            SQUARE_WIDTH -> super.onMeasure(widthMeasureSpec, widthMeasureSpec)
+            SQUARE_HEIGHT -> super.onMeasure(heightMeasureSpec, heightMeasureSpec)
+            else -> super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         }
     }
 
-    private fun generateMaskPath(w: Int, h: Int) {
-        mMaskPath = Path()
-        mMaskPath!!.addRoundRect(RectF(0f, 0f, w.toFloat(), h.toFloat()), mCornerRadius.toFloat(), mCornerRadius.toFloat(), Path.Direction.CW)
-        mMaskPath!!.fillType = Path.FillType.INVERSE_WINDING
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        when (squareMode) {
+            SQUARE_WIDTH -> super.onSizeChanged(w, w, oldw, oldh)
+            SQUARE_HEIGHT -> super.onSizeChanged(h, h, oldw, oldh)
+            else -> super.onSizeChanged(w, h, oldw, oldh)
+        }
+        setPath()
     }
 
-    override fun onDraw(canvas: Canvas) {
-        if (canvas.isOpaque) { // If canvas is opaque, make it transparent
-            canvas.saveLayerAlpha(0f, 0f, canvas.width.toFloat(), canvas.height.toFloat(), 255, Canvas.ALL_SAVE_FLAG)
+    override fun onDraw(canvas: Canvas?) {
+        if(!path.isEmpty) {
+            canvas?.clipPath(path)
         }
-
         super.onDraw(canvas)
+    }
 
-        if (mMaskPath != null) {
-            canvas.drawPath(mMaskPath, mMaskPaint)
+    private fun setPath() {
+        path.rewind()
+
+        if(cornerRadius >= 1f && roundedCorners != CORNER_NONE) {
+            val twoRadius = cornerRadius * 2
+            cornerRect.set(-cornerRadius.toFloat(), -cornerRadius.toFloat(), cornerRadius.toFloat(), cornerRadius.toFloat())
+
+            if(isRounded(CORNER_TOP_LEFT)) {
+                cornerRect.offsetTo(0f, 0f)
+                path.arcTo(cornerRect, 180f, 90f)
+            } else {
+                path.moveTo(0f, 0f)
+            }
+
+            if(isRounded(CORNER_TOP_RIGHT)) {
+                cornerRect.offsetTo((width - twoRadius).toFloat(), 0f)
+                path.arcTo(cornerRect, 270f, 90f)
+            } else {
+                path.lineTo(width.toFloat(), 0f)
+            }
+
+            if(isRounded(CORNER_BOTTOM_RIGHT)) {
+                cornerRect.offsetTo((width - twoRadius).toFloat(), (height - twoRadius).toFloat())
+                path.arcTo(cornerRect, 0f, 90f)
+            } else {
+                path.lineTo(width.toFloat(), height.toFloat())
+            }
+
+            if(isRounded(CORNER_BOTTOM_LEFT)) {
+                cornerRect.offsetTo(0f, (height - twoRadius).toFloat())
+                path.arcTo(cornerRect, 90f, 90f)
+            } else {
+                path.lineTo(0f, height.toFloat())
+            }
+
+            path.close()
         }
     }
+
+    private fun isRounded(corner:Int) : Boolean  = corner.and(roundedCorners) == corner
 }

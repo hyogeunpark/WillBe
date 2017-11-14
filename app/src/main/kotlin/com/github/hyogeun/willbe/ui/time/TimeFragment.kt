@@ -34,6 +34,6 @@ class TimeFragment: Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.calendarContentRecyclerView.setEmptyView(mBinding.emptyView)
-        mBinding.calendarContentRecyclerView.adapter = AlarmAdapter()
+        mBinding.calendarContentRecyclerView.adapter = AlarmAdapter(AlarmAdapter.GRID_MODE)
     }
 }

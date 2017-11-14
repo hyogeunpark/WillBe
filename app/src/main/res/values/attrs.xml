@@ -3,4 +3,20 @@
     <declare-styleable name="CalendarView">
         <attr name="dateFormat" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="RoundedImageView">
+        <attr name="cornerRadius" format="dimension" />
+        <attr name="roundedCorners">
+            <flag name="topLeft" value="1" />
+            <flag name="topRight" value="2" />
+            <flag name="bottomRight" value="4" />
+            <flag name="bottomLeft" value="8" />
+            <flag name="all" value="15" />
+        </attr>
+        <attr name="squareMode">
+            <flag name="none" value="0" />
+            <flag name="width" value="1" />
+            <flag name="height" value="2" />
+        </attr>
+    </declare-styleable>
 </resources>

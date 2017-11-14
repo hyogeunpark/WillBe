@@ -13,7 +13,7 @@
             android:layout_height="match_parent"
             app:layoutManager="GridLayoutManager"
             app:spanCount="2"
-            tools:listitem="@layout/grid_list_time_alarm" />
+            tools:listitem="@layout/row_grid_list_time_alarm" />
 
         <LinearLayout
             android:id="@+id/empty_view"

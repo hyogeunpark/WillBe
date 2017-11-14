@@ -1,57 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.v4.widget.NestedScrollView
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="match_parent">
 
-        <android.support.constraint.ConstraintLayout
+        <com.github.hyogeun.willbe.ui.view.CalendarView
+            android:id="@+id/calendar_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            app:dateFormat="yyyy년 MMMM" />
 
-            <com.github.hyogeun.willbe.ui.view.CalendarView
-                android:id="@+id/calendar_view"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:dateFormat="yyyy년 MMMM"
-                app:layout_constraintBottom_toTopOf="@+id/calendar_content_recycler_view"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <RelativeLayout
+            android:id="@+id/list_bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#f2f2f2"
+            app:layout_behavior="@string/bottom_sheet_behavior"
+            app:behavior_hideable="false"
+            app:behavior_peekHeight="150dp">
 
             <com.github.hyogeun.willbe.ui.view.RecyclerViewEmptySupport
                 android:id="@+id/calendar_content_recycler_view"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:nestedScrollingEnabled="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layoutManager="LinearLayoutManager"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/calendar_view" />
+                tools:listitem="@layout/row_linear_list_time_alarm" />
 
             <LinearLayout
                 android:id="@+id/empty_view"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/calendar_view">
+                android:visibility="gone"
+                android:layout_centerInParent="true">
 
                 <android.support.v7.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="저장된 알람이 없습니다!"
-                    android:drawableTop="@mipmap/ic_empty_warning"
                     android:drawablePadding="10dp"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/black"/>
+                    android:drawableTop="@mipmap/ic_empty_warning"
+                    android:text="저장된 알람이 없습니다!"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
             </LinearLayout>
-        </android.support.constraint.ConstraintLayout>
-    </android.support.v4.widget.NestedScrollView>
+        </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
 </layout>
