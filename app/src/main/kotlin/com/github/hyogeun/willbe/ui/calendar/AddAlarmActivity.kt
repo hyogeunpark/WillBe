@@ -8,6 +8,8 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatCheckBox
+import android.transition.ChangeBounds
+import android.transition.TransitionManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -42,14 +44,16 @@ class AddAlarmActivity: AppCompatActivity(), View.OnClickListener, CompoundButto
         setSupportActionBar(mBinding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mBinding.addTag.setOnClickListener(this)
-        mBinding.alarmDate.setOnClickListener(this)
-        mBinding.alarmDatePicker.init(mBinding.alarmDatePicker.year, mBinding.alarmDatePicker.month, mBinding.alarmDatePicker.dayOfMonth
-        ) { _, year, month, dayOfMonth ->
-            mBinding.alarmDate.text = String.format("%d년 %d월 %d일", year, month+1, dayOfMonth)
+        with(mBinding.alarmInfo!!) {
+            alarmDate.setOnClickListener(this@AddAlarmActivity)
+            alarmDatePicker.init(alarmDatePicker.year, alarmDatePicker.month, alarmDatePicker.dayOfMonth
+            ) { _, year, month, dayOfMonth ->
+                alarmDate.text = String.format("%d년 %d월 %d일", year, month + 1, dayOfMonth)
+            }
+            alarmDatePicker.minDate = System.currentTimeMillis() - 1000
+            alarmTimeMode.setOnCheckedChangeListener(this@AddAlarmActivity)
+            visibility = isDayVisibility
         }
-        mBinding.alarmDatePicker.minDate = System.currentTimeMillis() - 1000
-        mBinding.alarmTimeMode.setOnCheckedChangeListener(this)
-        mBinding.visibility = isDayVisibility
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -61,35 +65,43 @@ class AddAlarmActivity: AppCompatActivity(), View.OnClickListener, CompoundButto
         if(item?.itemId == R.id.save) {
             val alarm = Alarm()
             alarm.tags.addAll(mBinding.tags.tags)
-            val calendar: Calendar = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                GregorianCalendar(mBinding.alarmDatePicker.year, mBinding.alarmDatePicker.month, mBinding.alarmDatePicker.dayOfMonth,
-                                        mBinding.alarmTimePicker.hour, mBinding.alarmTimePicker.minute)
-            } else {
-                GregorianCalendar(mBinding.alarmDatePicker.year, mBinding.alarmDatePicker.month, mBinding.alarmDatePicker.dayOfMonth,
-                        mBinding.alarmTimePicker.currentHour, mBinding.alarmTimePicker.currentMinute)
+            mBinding.alarmInfo?.let {
+                val calendar: Calendar = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    GregorianCalendar(it.alarmDatePicker.year, it.alarmDatePicker.month, it.alarmDatePicker.dayOfMonth,
+                            it.alarmTimePicker.hour, it.alarmTimePicker.minute)
+                } else {
+                    GregorianCalendar(it.alarmDatePicker.year, it.alarmDatePicker.month, it.alarmDatePicker.dayOfMonth,
+                            it.alarmTimePicker.currentHour, it.alarmTimePicker.currentMinute)
+                }
+                alarm.date = calendar.timeInMillis
+                alarm.memo = it.alarmMemo.text.toString()
             }
-            alarm.date = calendar.timeInMillis
-            alarm.memo = mBinding.alarmMemo.text.toString()
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onCheckedChanged(button: CompoundButton?, isChecked: Boolean) {
         isDayVisibility.set(isChecked)
-        mBinding.alarmTimeMode.text = if (isChecked) "날짜 설정" else "요일 설정"
+        mBinding.alarmInfo!!.alarmTimeMode.text = if (isChecked) "날짜 설정" else "요일 설정"
     }
 
     override fun onClick(view: View?) {
         if(view == mBinding.addTag) {
             mBinding.tags.addTagView(mBinding.autoCompleteTextView.text.toString())
             mBinding.autoCompleteTextView.setText("")
-        } else if(view == mBinding.alarmDate) {
-            if(mBinding.alarmDatePicker.visibility == View.GONE) {
-                expand(mBinding.alarmDatePicker)
-                mBinding.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0,0, R.mipmap.ic_expand_less_black, 0)
+        } else if(view == mBinding.alarmInfo!!.alarmDate) {
+            /*if(mBinding.alarmInfo.alarmDatePicker.visibility == View.GONE) {
+                expand(mBinding.alarmInfo.alarmDatePicker)
+                mBinding.alarmInfo.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0,0, R.mipmap.ic_expand_less_black, 0)
             } else {
-                collapse(mBinding.alarmDatePicker)
-                mBinding.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0,0, R.mipmap.ic_expand_more_black, 0)
+                collapse(mBinding.alarmInfo.alarmDatePicker)
+                mBinding.alarmInfo.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0,0, R.mipmap.ic_expand_more_black, 0)
+            }*/
+            TransitionManager.beginDelayedTransition(mBinding.scrollview, ChangeBounds())
+            mBinding.alarmInfo?.let {
+                it.alarmDatePicker.visibility = if(it.alarmDatePicker.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                val buttonImage = if(it.alarmDatePicker.visibility == View.GONE) R.mipmap.ic_expand_less_black else R.mipmap.ic_expand_more_black
+                it.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0,0, buttonImage, 0)
             }
         }
     }

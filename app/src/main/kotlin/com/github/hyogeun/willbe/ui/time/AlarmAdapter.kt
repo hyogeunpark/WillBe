@@ -10,6 +10,7 @@ import com.github.hyogeun.willbe.R
 import com.github.hyogeun.willbe.databinding.RowGridListTimeAlarmBinding
 import com.github.hyogeun.willbe.databinding.RowLinearListTimeAlarmBinding
 import com.github.hyogeun.willbe.model.Alarm
+import com.github.hyogeun.willbe.ui.detail.AlarmDetailActivity
 
 /**
  * Created by SAMSUNG on 2017-11-08.
@@ -60,6 +61,9 @@ class AlarmAdapter(mode: Int): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val mBinding: RowLinearListTimeAlarmBinding = DataBindingUtil.bind(itemView)
 
         fun setData() {
+            itemView.setOnClickListener { view ->
+                AlarmDetailActivity.createInstance(view.context)
+            }
             Glide.with(itemView.context)
                     .load("http://blogfiles8.naver.net/MjAxNzA2MDZfMjI2/MDAxNDk2NzU3ODgzMjgx.lwX-ZBDJcHHF67yG7eGhMM2BQqjHbIxKd76ThsloomAg.6ffi9JDp_ru0ay5cdzKSVTzEf9MX4FlP-3oL5y1qIE8g.PNG.daddy2015/%BC%BA%B0%F8%B8%ED%BE%F0%2C_%C0%CE%BB%FD%B8%ED%BE%F0%2C_%B8%F1%C7%A5%B8%A6_%C0%CC%B7%E7%B0%D4_%C7%CF%B4%C2_%C0%CE%BB%FD_%BC%BA%B0%F8_%B8%ED%BE%F0_%B8%F0%C0%BD_4.png")
                     .into(mBinding.alarmListItemBackground)
