@@ -1,5 +1,6 @@
 package com.github.hyogeun.willbe.ui.calendar
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
@@ -20,23 +21,34 @@ import android.view.animation.Transformation
 import android.view.animation.Animation
 import android.widget.CompoundButton
 import com.github.hyogeun.willbe.model.Alarm
+import com.github.hyogeun.willbe.ui.common.BaseActivity
+import io.realm.Realm
 import java.util.*
 
 
 /**
  * Created by SAMSUNG on 2017-10-28.
  */
-class AddAlarmActivity: AppCompatActivity(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+/**
+ * 알람 벨소리 관련
+ *    https://www.androidpub.com/1701852
+ *    http://www.masterqna.com/android/11659/%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-%EA%B8%B0%EB%B3%B8-%EB%B2%A8%EC%86%8C%EB%A6%AC-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0-%EC%A7%88%EB%AC%B8-%EB%93%9C%EB%A6%BD%EB%8B%88%EB%8B%A4
+ *    http://blog.naver.com/PostView.nhn?blogId=starwoin&logNo=90172557299
+ */
+
+//TODO 벨소리 선택
+class AddAlarmActivity : BaseActivity(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     companion object {
-        fun createInstance(context: Context) {
+        @JvmField val REQ_CODE_ADD_ALARM = AddAlarmActivity::class.hashCode().and(0x000000ff)
+        fun createInstance(context: Activity) {
             val intent = Intent(context, AddAlarmActivity::class.java)
-            context.startActivity(intent)
+            context.startActivityForResult(intent, REQ_CODE_ADD_ALARM)
         }
     }
 
     private lateinit var mBinding: ActivityAddAlramBinding
-    private var isDayVisibility:ObservableBoolean = ObservableBoolean(false)
+    private var isDayVisibility: ObservableBoolean = ObservableBoolean(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,10 +74,13 @@ class AddAlarmActivity: AppCompatActivity(), View.OnClickListener, CompoundButto
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if(item?.itemId == R.id.save) {
-            val alarm = Alarm()
-            alarm.tags.addAll(mBinding.tags.tags)
+        if (item?.itemId == R.id.save) {
             mBinding.alarmInfo?.let {
+                val alarm = Alarm()
+                //TODO 주석 해제 할것
+//            alarm.tags.addAll(mBinding.tags.tags)
+                alarm.tags.add("#워너비")
+                alarm.tags.add("명언")
                 val calendar: Calendar = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     GregorianCalendar(it.alarmDatePicker.year, it.alarmDatePicker.month, it.alarmDatePicker.dayOfMonth,
                             it.alarmTimePicker.hour, it.alarmTimePicker.minute)
@@ -75,6 +90,15 @@ class AddAlarmActivity: AppCompatActivity(), View.OnClickListener, CompoundButto
                 }
                 alarm.date = calendar.timeInMillis
                 alarm.memo = it.alarmMemo.text.toString()
+                alarm.instaImage.put(alarm.tags[0], "http://blogfiles5.naver.net/20141007_267/nineps_1412644756693qW7MK_JPEG/yay8567378.jpg")
+                alarm.instaImage.put(alarm.tags[1], "http://blogfiles8.naver.net/MjAxNzA2MDZfMjI2/MDAxNDk2NzU3ODgzMjgx.lwX-ZBDJcHHF67yG7eGhMM2BQqjHbIxKd76ThsloomAg.6ffi9JDp_ru0ay5cdzKSVTzEf9MX4FlP-3oL5y1qIE8g.PNG.daddy2015/%BC%BA%B0%F8%B8%ED%BE%F0%2C_%C0%CE%BB%FD%B8%ED%BE%F0%2C_%B8%F1%C7%A5%B8%A6_%C0%CC%B7%E7%B0%D4_%C7%CF%B4%C2_%C0%CE%BB%FD_%BC%BA%B0%F8_%B8%ED%BE%F0_%B8%F0%C0%BD_4.png")
+                val realm = Realm.getDefaultInstance()
+                val index = realm.where(Alarm::class.java).max(Alarm.INDEX)
+                alarm.index = index.toInt() + 1
+                realm.executeTransaction {
+                    realm.copyToRealmOrUpdate(alarm)
+                    realm.close()
+                }
             }
         }
         return super.onOptionsItemSelected(item)
@@ -86,68 +110,16 @@ class AddAlarmActivity: AppCompatActivity(), View.OnClickListener, CompoundButto
     }
 
     override fun onClick(view: View?) {
-        if(view == mBinding.addTag) {
+        if (view == mBinding.addTag) {
             mBinding.tags.addTagView(mBinding.autoCompleteTextView.text.toString())
             mBinding.autoCompleteTextView.setText("")
-        } else if(view == mBinding.alarmInfo!!.alarmDate) {
-            /*if(mBinding.alarmInfo.alarmDatePicker.visibility == View.GONE) {
-                expand(mBinding.alarmInfo.alarmDatePicker)
-                mBinding.alarmInfo.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0,0, R.mipmap.ic_expand_less_black, 0)
-            } else {
-                collapse(mBinding.alarmInfo.alarmDatePicker)
-                mBinding.alarmInfo.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0,0, R.mipmap.ic_expand_more_black, 0)
-            }*/
+        } else if (view == mBinding.alarmInfo!!.alarmDate) {
             TransitionManager.beginDelayedTransition(mBinding.scrollview, ChangeBounds())
             mBinding.alarmInfo?.let {
-                it.alarmDatePicker.visibility = if(it.alarmDatePicker.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-                val buttonImage = if(it.alarmDatePicker.visibility == View.GONE) R.mipmap.ic_expand_less_black else R.mipmap.ic_expand_more_black
-                it.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0,0, buttonImage, 0)
+                it.alarmDatePicker.visibility = if (it.alarmDatePicker.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                val buttonImage = if (it.alarmDatePicker.visibility == View.VISIBLE) R.mipmap.ic_expand_less_black else R.mipmap.ic_expand_more_black
+                it.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0, 0, buttonImage, 0)
             }
         }
-    }
-
-    private fun expand(v: View) {
-        v.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        val targetHeight = v.measuredHeight
-
-        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
-        v.layoutParams.height = 1
-        val a = object : Animation() {
-            override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-                v.layoutParams.height = if (interpolatedTime == 1f) ViewGroup.LayoutParams.WRAP_CONTENT else (targetHeight * interpolatedTime).toInt()
-                v.requestLayout()
-            }
-
-            override fun willChangeBounds(): Boolean {
-                return true
-            }
-        }
-
-        // 1dp/ms
-        a.duration = (targetHeight / v.context.resources.displayMetrics.density).toLong()
-        v.startAnimation(a)
-        v.postDelayed({ v.visibility = View.VISIBLE }, 150)
-    }
-
-    private fun collapse(v: View) {
-        val initialHeight = v.measuredHeight
-
-        val a = object : Animation() {
-            override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-                if (interpolatedTime == 1f) {
-                    v.visibility = View.GONE
-                } else {
-                    v.layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
-                    v.requestLayout()
-                }
-            }
-            override fun willChangeBounds(): Boolean {
-                return true
-            }
-        }
-
-        // 1dp/ms
-        a.duration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
-        v.startAnimation(a)
     }
 }

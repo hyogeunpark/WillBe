@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:minHeight="130dp"
             android:scaleType="centerCrop"
-            app:cornerRadius="12dp"
+            app:cornerRadius="8dp"
             app:roundedCorners="all" />
 
         <android.support.constraint.ConstraintLayout

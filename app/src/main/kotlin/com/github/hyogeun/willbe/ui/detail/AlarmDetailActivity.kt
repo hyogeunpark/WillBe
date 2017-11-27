@@ -6,7 +6,8 @@ import android.databinding.DataBindingUtil
 import android.databinding.ObservableBoolean
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
-import android.support.v7.app.AppCompatActivity
+import android.transition.ChangeBounds
+import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
@@ -14,12 +15,13 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.github.hyogeun.willbe.R
 import com.github.hyogeun.willbe.databinding.ActivityAlarmDetailBinding
+import com.github.hyogeun.willbe.ui.common.BaseActivity
 import java.util.*
 
 /**
  * Created by SAMSUNG on 2017-11-18.
  */
-class AlarmDetailActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener {
+class AlarmDetailActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     companion object {
         fun createInstance(context: Context) {
@@ -41,6 +43,7 @@ class AlarmDetailActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeL
         }
         mBinding.alarmDetailViewPager.adapter = ImagePagerAdapter()
         with(mBinding.alarmDetailInfo!!) {
+            alarmDate.setOnClickListener(this@AlarmDetailActivity)
             alarmTimeMode.setOnCheckedChangeListener(this@AlarmDetailActivity)
             visibility = isDayVisibility
         }
@@ -49,6 +52,17 @@ class AlarmDetailActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeL
     override fun onCheckedChanged(button: CompoundButton?, isChecked: Boolean) {
         isDayVisibility.set(isChecked)
         mBinding.alarmDetailInfo?.alarmTimeMode?.text = if (isChecked) "날짜 설정" else "요일 설정"
+    }
+
+    override fun onClick(view: View?) {
+        if(view == mBinding.alarmDetailInfo!!.alarmDate) {
+            TransitionManager.beginDelayedTransition(mBinding.nestedScrollView, ChangeBounds())
+            mBinding.alarmDetailInfo?.let {
+                it.alarmDatePicker.visibility = if (it.alarmDatePicker.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                val buttonImage = if (it.alarmDatePicker.visibility == View.VISIBLE) R.mipmap.ic_expand_less_black else R.mipmap.ic_expand_more_black
+                it.alarmDate.setCompoundDrawablesWithIntrinsicBounds(0, 0, buttonImage, 0)
+            }
+        }
     }
 
     class ImagePagerAdapter : PagerAdapter() {

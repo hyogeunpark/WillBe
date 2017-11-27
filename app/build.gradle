@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
@@ -40,6 +41,7 @@ dependencies {
     implementation rootProject.ext.kotlin
     implementation rootProject.ext.glide
     implementation rootProject.ext.glideTransformations
+    implementation rootProject.ext.flexboxLayout
     kapt 'com.android.databinding:compiler:3.0.0'
     testImplementation 'junit:junit:4.12'
 }

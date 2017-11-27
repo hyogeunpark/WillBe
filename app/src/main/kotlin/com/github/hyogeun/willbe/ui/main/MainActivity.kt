@@ -1,8 +1,11 @@
 package com.github.hyogeun.willbe.ui.main
 
+import android.app.Activity
+import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -16,7 +19,9 @@ import com.github.hyogeun.willbe.R
 import com.github.hyogeun.willbe.databinding.ActivityMainBinding
 import com.github.hyogeun.willbe.ui.calendar.AddAlarmActivity
 import com.github.hyogeun.willbe.ui.calendar.CalendarFragment
+import com.github.hyogeun.willbe.ui.detail.AlarmActivity
 import com.github.hyogeun.willbe.ui.time.TimeFragment
+import io.realm.Realm
 
 /**
  * Created by SAMSUNG on 2017-10-18.
@@ -51,6 +56,15 @@ class MainActivity: AppCompatActivity() {
                 tab?.icon?.setColorFilter(ContextCompat.getColor(this@MainActivity, android.R.color.black), PorterDuff.Mode.SRC_IN)
             }
         })
+        object: CountDownTimer(5000, 1000) {
+
+            override fun onTick(millisUntilFinished:Long) {
+            }
+
+            override fun onFinish() {
+                AlarmActivity.createInstance(this@MainActivity)
+            }
+        }.start()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -66,22 +80,26 @@ class MainActivity: AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        /*if(requestCode == AddAlarmActivity.REQ_CODE_ADD_ALARM) {
+            if(resultCode == Activity.RESULT_OK) {
+                val realm = Realm.getDefaultInstance()
+                realm.where()
+            }
+        }*/
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     inner class ViewPagerAdapter(fm: FragmentManager): FragmentPagerAdapter(fm) {
         private val tabTitles = arrayOf(getString(R.string.tab_time), getString(R.string.tab_calendar))
-        override fun getCount(): Int {
-            return tabTitles.size
-        }
+        override fun getCount(): Int = tabTitles.size
 
-        override fun getPageTitle(position: Int): CharSequence {
-            return tabTitles[position]
-        }
+        override fun getPageTitle(position: Int): CharSequence = tabTitles[position]
 
-        override fun getItem(position: Int): Fragment {
-            return when(position) {
-                0 -> TimeFragment.newInstance()
-                1 -> CalendarFragment.newInstance()
-                else -> Fragment()
-            }
+        override fun getItem(position: Int): Fragment = when(position) {
+            0 -> TimeFragment.newInstance()
+            1 -> CalendarFragment.newInstance()
+            else -> Fragment()
         }
     }
 }

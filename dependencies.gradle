@@ -7,12 +7,12 @@ ext {
     versionCode = 1
     versionName = "1.0"
 
-
     supportLib_version = '26.+'
     constraint_version = '1.0.2'
     kotlin_version = '1.1.51'
     glide_version = '4.3.0'
     glideTransformations_version = '3.0.1'
+    flexboxLayout_version = '0.3.1'
 
     appcompatLib = "com.android.support:appcompat-v7:$supportLib_version"
     design = "com.android.support:design:$supportLib_version"
@@ -22,4 +22,5 @@ ext {
     kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     glide = "com.github.bumptech.glide:glide:$glide_version"
     glideTransformations = "jp.wasabeef:glide-transformations:$glideTransformations_version"
+    flexboxLayout = "com.google.android:flexbox:$flexboxLayout_version"
 }
