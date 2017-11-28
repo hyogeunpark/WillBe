@@ -1,28 +1,25 @@
 package com.github.hyogeun.willbe.ui.calendar
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.databinding.ObservableBoolean
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.AppCompatCheckBox
 import android.transition.ChangeBounds
 import android.transition.TransitionManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import com.github.hyogeun.willbe.R
 import com.github.hyogeun.willbe.databinding.ActivityAddAlramBinding
-import android.view.animation.Transformation
-import android.view.animation.Animation
 import android.widget.CompoundButton
+import com.github.hyogeun.willbe.data.RealmString
 import com.github.hyogeun.willbe.model.Alarm
+import com.github.hyogeun.willbe.model.Image
 import com.github.hyogeun.willbe.ui.common.BaseActivity
 import io.realm.Realm
+import io.realm.RealmList
 import java.util.*
 
 
@@ -79,8 +76,8 @@ class AddAlarmActivity : BaseActivity(), View.OnClickListener, CompoundButton.On
                 val alarm = Alarm()
                 //TODO 주석 해제 할것
 //            alarm.tags.addAll(mBinding.tags.tags)
-                alarm.tags.add("#워너비")
-                alarm.tags.add("명언")
+                alarm.tags.add(RealmString("#워너비"))
+                alarm.tags.add(RealmString("명언"))
                 val calendar: Calendar = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     GregorianCalendar(it.alarmDatePicker.year, it.alarmDatePicker.month, it.alarmDatePicker.dayOfMonth,
                             it.alarmTimePicker.hour, it.alarmTimePicker.minute)
@@ -90,8 +87,8 @@ class AddAlarmActivity : BaseActivity(), View.OnClickListener, CompoundButton.On
                 }
                 alarm.date = calendar.timeInMillis
                 alarm.memo = it.alarmMemo.text.toString()
-                alarm.instaImage.put(alarm.tags[0], "http://blogfiles5.naver.net/20141007_267/nineps_1412644756693qW7MK_JPEG/yay8567378.jpg")
-                alarm.instaImage.put(alarm.tags[1], "http://blogfiles8.naver.net/MjAxNzA2MDZfMjI2/MDAxNDk2NzU3ODgzMjgx.lwX-ZBDJcHHF67yG7eGhMM2BQqjHbIxKd76ThsloomAg.6ffi9JDp_ru0ay5cdzKSVTzEf9MX4FlP-3oL5y1qIE8g.PNG.daddy2015/%BC%BA%B0%F8%B8%ED%BE%F0%2C_%C0%CE%BB%FD%B8%ED%BE%F0%2C_%B8%F1%C7%A5%B8%A6_%C0%CC%B7%E7%B0%D4_%C7%CF%B4%C2_%C0%CE%BB%FD_%BC%BA%B0%F8_%B8%ED%BE%F0_%B8%F0%C0%BD_4.png")
+                alarm.instaImage.add(Image(alarm.tags[0].value, RealmList(RealmString("http://blogfiles5.naver.net/20141007_267/nineps_1412644756693qW7MK_JPEG/yay8567378.jpg"))))
+                alarm.instaImage.add(Image(alarm.tags[1].value, RealmList(RealmString("http://blogfiles8.naver.net/MjAxNzA2MDZfMjI2/MDAxNDk2NzU3ODgzMjgx.lwX-ZBDJcHHF67yG7eGhMM2BQqjHbIxKd76ThsloomAg.6ffi9JDp_ru0ay5cdzKSVTzEf9MX4FlP-3oL5y1qIE8g.PNG.daddy2015/%BC%BA%B0%F8%B8%ED%BE%F0%2C_%C0%CE%BB%FD%B8%ED%BE%F0%2C_%B8%F1%C7%A5%B8%A6_%C0%CC%B7%E7%B0%D4_%C7%CF%B4%C2_%C0%CE%BB%FD_%BC%BA%B0%F8_%B8%ED%BE%F0_%B8%F0%C0%BD_4.png"))))
                 val realm = Realm.getDefaultInstance()
                 val index = realm.where(Alarm::class.java).max(Alarm.INDEX)
                 alarm.index = index.toInt() + 1

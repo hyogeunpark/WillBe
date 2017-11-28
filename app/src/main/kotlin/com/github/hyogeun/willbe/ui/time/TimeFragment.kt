@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.hyogeun.willbe.R
+import com.github.hyogeun.willbe.data.RealmUtils
 import com.github.hyogeun.willbe.databinding.FragmentTimeBinding
 import com.github.hyogeun.willbe.model.Alarm
 import io.realm.Realm
@@ -38,7 +39,7 @@ class TimeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mBinding.calendarContentRecyclerView.setEmptyView(mBinding.emptyView)
         mBinding.calendarContentRecyclerView.adapter = AlarmAdapter(AlarmAdapter.GRID_MODE)
-        val realm = Realm.getDefaultInstance()
+        val realm = Realm.getInstance(RealmUtils.CONFIG_ALARM)
         val alarms = realm.where(Alarm::class.java).apply {
             findAll().addChangeListener { results: RealmResults<Alarm> ->
                 Log.i("PHG alarm size", results.size.toString())
